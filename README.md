@@ -438,6 +438,122 @@
     }
     ```
 
+
+#### Отримати інфо про домашнє завдання за ID
+
+Отримує інформацію про одне домашнє завдання за його ідентифікатором.
+
+* **Метод:** `GET`
+
+* **URL:** `/{branch_alias}/homework/{homework_id}`
+
+* **Заголовки:**
+  `authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1Ni...`
+
+* **Приклад:**
+
+  ```
+  GET https://mapi.itstep.org/v1/mystat/pl/homework/130347
+  ```
+
+* **Відповідь (200 OK):**
+
+```json
+{
+  "0": {
+    "id": "<homework-id>",
+    "id_spec": "<spec-id>",
+    "id_teach": "<teacher-id>",
+    "id_group": "<group-id>",
+    "fio_teach": "<ім'я_викладача>",
+    "theme": "<тема_завдання>",
+    "completion_time": "<дата_виконання>",
+    "creation_time": "<дата_створення>",
+    "overdue_time": "<дата_прострочення>",
+    "file_path": "<url_файлу>",
+    "comment": "<коментар_до_завдання>",
+    "name_spec": "<назва_предмета>",
+    "status": 3,
+    "homework_stud": {
+      "id": "<student-homework-id>",
+      "file_path": null,
+      "mark": null,
+      "creation_time": "<дата_створення>",
+      "stud_answer": "",
+      "auto_mark": false,
+      "status": 3,
+      "photo_pas": null,
+      "fio_stud": "<ім'я_студента>",
+      "related_homeworks": null,
+      "related_materials": null,
+      "unlock_expire": "0",
+      "communication_history": [],
+      "is_retake": "0"
+    },
+    "cover_image": null,
+    "is_autotest": 0,
+    "autotest_status": null,
+    "autotest_result": null,
+    "is_academic_holiday": 0,
+    "ospr": 0,
+    "teach_photo_pas": null,
+    "default_deadline_days": 182,
+    "coins_to_close_deadline": 20,
+    "completion_days": "<кількість_днів>",
+    "homework_comment": {
+      "text_comment": "",
+      "attachment": null,
+      "attachment_path": null,
+      "date_updated": ""
+    }
+  },
+  "relatedHomeworks": [
+    {
+      "id_domzadstud": "<related-student-homework-id>",
+      "id_teach": "<teacher-id>",
+      "id_stud": "<student-id>",
+      "status": "1",
+      "time": "<дата_виконання>",
+      "id_domzad": "<related-homework-id>",
+      "ospr": "0",
+      "mark": "<оцінка>",
+      "nlenta": "<номер_стрічки>",
+      "date_vizit": "<дата_відвідування>",
+      "is_retake": "0",
+      "auto_test_status": "0",
+      "auto_test_response": null,
+      "unlock_expire": "0",
+      "domZad": {
+        "id_domzad": "<related-homework-id>",
+        "material_link": null,
+        "id_teach": "<teacher-id>",
+        "id_tgroups": "<group-id>",
+        "id_spec": "<spec-id>",
+        "time": "<дата_створення>",
+        "id_schedule": "<schedule-id>",
+        "nlenta": "<номер_стрічки>",
+        "date": "<дата>",
+        "ospr": "0",
+        "dz_theme": "<тема_завдання>",
+        "deadline": "<дата_здачі>",
+        "is_autotest": "0",
+        "public_material_uuid": null,
+        "spec": {
+          "id_spec": "<spec-id>",
+          "name_spec": "<назва_предмета>",
+          "short_name_spec": "<коротка_назва>",
+          "id_form": "<form-id>",
+          "id_dir": "<dir-id>",
+          "status": "0"
+        },
+        "cover": null
+      }
+    }
+  ]
+}
+
+```
+ 
 #### Отримати домашні завдання за певними предметами (фільтр)
 Отримує домашні завдання для вказаних предметів (фільтр за `spec_id`).
 
