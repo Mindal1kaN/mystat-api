@@ -35,7 +35,7 @@
 ```
 -   **Помилки автентифікації:** При неправильному логіні або паролі в ендпоінті `/auth/login` сервер повертає "Unauthorized: error_unauthorized" з кодом 401.
 -   **`branch_alias`:** Поле `"<branch_alias>": "pl"` у відповіді `/auth/me` визначає префікс для ендпоінтів, пов'язаних з філією. Наприклад, якщо `branch_alias = "pl"`, то ендпоінти починаються з `/pl/` (наприклад, `/pl/gaming/get-balances`). Якщо `branch_alias = "kiev"`, то ендпоінти починаються з `/kiev/`. Це дозволяє динамічно формувати URL на основі філії користувача. Замініть `"pl"` на відповідний alias у всіх релевантних ендпоінтах.
--   **Статус домашніх завдань:** `3` — "До виконання", `2` — "На перевірці", `1` — "Виконано".
+-   **Статус домашніх завдань:** `3` — "До виконання", `2` — "На перевірці", `1` — "Виконано", `0` — "Прострочені"
 -   **Статус замовлень:** `3` — "Замовлено".
 -   **Пагінація:** Деякі ендпоінти (наприклад, продукти магазину чи нарахування активності) підтримує пагінацію через параметри `page` та `per_page`.
 -   **Валюта:** Ціни у магазині вказані у двох валютах: `COI` (монети) та `DIA` (кристали).
@@ -218,11 +218,11 @@
 
 ### Домашні завдання
 
-#### Отримати домашні завдання до виконання (статус 3)
-Цей ендпоінт повертає список домашніх завдань зі статусом 3 ("До виконання"), включаючи деталі про тему, терміни, файли та мета-інформацію про пагінацію.
+#### Отримати домашні завдання
+
 
 -   **Метод:** `GET`
--   **URL:** `/{branch_alias}/homework/list?status=3&limit=1000&sort=-hw.time`
+-   **URL:** `/{branch_alias}/homework/list?status=<Статуси описані в початку>&limit=1000&sort=-hw.time`
 -   **Заголовки:** `authorization: Bearer <токен>`
 -   **Відповідь (200 OK):**
     ```json
@@ -255,7 +255,21 @@
             "related_homeworks": null,
             "related_materials": null,
             "unlock_expire": "0",
-            "communication_history": [],
+            "communication_history": [
+             {
+             "type_name": "homework_student_comment",
+             "comment": "<текст_відповіді>",
+             "date": "<дата>",
+             "file": null
+             },
+             {
+             "type_name": "homework_student_comment",
+             "comment": "",
+             "date": "<дата>",
+             "file": "<посилання_на_файл>"
+             }
+             ],
+    //або може бути просто "communication_history": [}
             "is_retake": "0"
           },
           "cover_image": null,
@@ -285,162 +299,6 @@
     }
     ```
 
-#### Отримати домашні завдання на перевірці (статус 2)
-Цей ендпоінт повертає список домашніх завдань зі статусом 2 ("На перевірці"), з деталями про відповідь студента, коментарі та історію комунікації.
-
--   **Метод:** `GET`
--   **URL:** `/{branch_alias}/homework/list?status=2&limit=1000&sort=-hw.time`
--   **Заголовки:** `authorization: Bearer <токен>`
--   **Відповідь (200 OK):**
-    ```json
-    {
-      "data": [
-        {
-          "id": "<homework-id>",
-          "id_spec": "<spec-id>",
-          "id_teach": "<teacher-id>",
-          "id_group": "<group-id>",
-          "fio_teach": "<ім'я_викладача>",
-          "theme": "<тема_завдання>",
-          "completion_time": "<дата_виконання>",
-          "creation_time": "<дата_створення>",
-          "overdue_time": "<дата_прострочення>",
-          "file_path": "<url_файлу>",
-          "comment": "",
-          "name_spec": "<назва_предмета>",
-          "status": 2,
-          "homework_stud": {
-            "id": "<student-homework-id>",
-            "file_path": null,
-            "mark": null,
-            "creation_time": "<дата_створення>",
-            "stud_answer": "<відповідь_студента>",
-            "auto_mark": false,
-            "status": 2,
-            "photo_pas": null,
-            "fio_stud": "<ім'я_студента>",
-            "related_homeworks": null,
-            "related_materials": null,
-            "unlock_expire": "0",
-            "communication_history": [
-              {
-                "type_name": "homework_student_comment",
-                "comment": "<коментар>",
-                "date": "<дата>",
-                "file": null
-              }
-              // структура повторюється для кожного запису історії
-            ],
-            "is_retake": "0"
-          },
-          "cover_image": null,
-          "is_autotest": 0,
-          "autotest_status": null,
-          "autotest_result": null,
-          "is_academic_holiday": 0,
-          "ospr": 0,
-          "teach_photo_pas": null,
-          "default_deadline_days": 182,
-          "coins_to_close_deadline": 20,
-          "completion_days": "<кількість_днів>",
-          "homework_comment": {
-            "text_comment": "",
-            "attachment": null,
-            "attachment_path": null,
-            "date_updated": ""
-          }
-        }
-        // структура повторюється для кожного завдання
-      ],
-      "_meta": {
-        "currentPage": 1,
-        "totalPages": 1,
-        "totalCount": "<кількість>"
-      }
-    }
-    ```
-
-#### Отримати виконані домашні завдання (статус 1)
-Цей ендпоінт повертає список домашніх завдань зі статусом 1 ("Виконано"), з оцінками, файлами, коментарями вчителя та історією комунікації.
-
--   **Метод:** `GET`
--   **URL:** `/{branch_alias}/homework/list?status=1&limit=1000&sort=-hw.time`
--   **Заголовки:** `authorization: Bearer <токен>`
--   **Відповідь (200 OK):**
-    ```json
-    {
-      "data": [
-        {
-          "id": "<homework-id>",
-          "id_spec": "<spec-id>",
-          "id_teach": "<teacher-id>",
-          "id_group": "<group-id>",
-          "fio_teach": "<ім'я_викладача>",
-          "theme": "<тема_завдання>",
-          "completion_time": "<дата_виконання>",
-          "creation_time": "<дата_створення>",
-          "overdue_time": "<дата_прострочення>",
-          "file_path": "<url_файлу>",
-          "comment": "",
-          "name_spec": "<назва_предмета>",
-          "status": 1,
-          "homework_stud": {
-            "id": "<student-homework-id>",
-            "file_path": "<url_файлу>",
-            "mark": "<оцінка>",
-            "creation_time": "<дата_створення>",
-            "stud_answer": "",
-            "auto_mark": false,
-            "status": 1,
-            "photo_pas": null,
-            "fio_stud": "<ім'я_студента>",
-            "related_homeworks": null,
-            "related_materials": null,
-            "unlock_expire": "0",
-            "communication_history": [
-              {
-                "type_name": "homework_student_comment",
-                "comment": "",
-                "date": "<дата>",
-                "file": "<url_файлу>"
-              },
-              {
-                "type_name": "homework_teacher_comment",
-                "comment": "",
-                "mark": "<оцінка>",
-                "date": "<дата>",
-                "file": null
-              }
-              // структура повторюється
-            ],
-            "is_retake": "0"
-          },
-          "cover_image": null,
-          "is_autotest": 0,
-          "autotest_status": null,
-          "autotest_result": null,
-          "is_academic_holiday": 0,
-          "ospr": 0,
-          "teach_photo_pas": null,
-          "default_deadline_days": 182,
-          "coins_to_close_deadline": 20,
-          "completion_days": "<кількість_днів>",
-          "homework_comment": {
-            "text_comment": "",
-            "attachment": null,
-            "attachment_path": null,
-            "date_updated": "<дата_оновлення>"
-          }
-        }
-        // структура повторюється
-      ],
-      "_meta": {
-        "currentPage": 1,
-        "totalPages": 1,
-        "totalCount": "<кількість>"
-      }
-    }
-    ```
 
 #### Отримати інфо про домашнє завдання за ID
 Цей ендпоінт повертає детальну інформацію про конкретне домашнє завдання за його ID, включаючи статус, коментарі, файли та пов'язані завдання (наприклад, перездачі).
