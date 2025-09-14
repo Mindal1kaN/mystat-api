@@ -269,7 +269,7 @@
              "file": "<посилання_на_файл>"
              }
              ],
-    //або може бути просто "communication_history": [}
+    //або може бути просто "communication_history": []
             "is_retake": "0"
           },
           "cover_image": null,
